@@ -117,6 +117,11 @@ impl SwiftBot {
         self.set_motor_speed(Motor::Right, 1.0);
     }
 
+    pub fn backward(&mut self) {
+        self.set_motor_speed(Motor::Left, -1.0);
+        self.set_motor_speed(Motor::Right, -1.0);
+    }
+
     pub fn stop(&mut self) {
         self.set_motor_speed(Motor::Left, 0.0);
         self.set_motor_speed(Motor::Right, 0.0);
