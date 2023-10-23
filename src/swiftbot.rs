@@ -189,6 +189,6 @@ impl SwiftBot {
         };
 
         let frequency = 2000.0;
-        led.set_pwm_frequency(frequency, value).expect("Unable to set PWM motor frequency");
+        led.set_pwm_frequency(frequency, value).expect("Unable to set PWM light frequency");
     }
 }
