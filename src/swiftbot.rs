@@ -7,11 +7,12 @@ use rppal::gpio::{Gpio, InputPin, OutputPin, Level};
 
 use crate::sn3218::SN3218;
 
-#[allow(dead_code)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Button {
     A, B, X, Y
 }
 
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Motor {
     Left, Right
 }
