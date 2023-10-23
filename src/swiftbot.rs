@@ -21,6 +21,10 @@ pub struct SwiftBot {
     button_b: InputPin,
     button_x: InputPin,
     button_y: InputPin,
+    button_a_led: OutputPin,
+    button_b_led: OutputPin,
+    button_x_led: OutputPin,
+    button_y_led: OutputPin,
     motor_en: OutputPin,
     motor_left_p: OutputPin,
     motor_left_n: OutputPin,
@@ -41,6 +45,11 @@ impl SwiftBot {
         let button_b = gpio.get(6)?.into_input();
         let button_x = gpio.get(16)?.into_input();
         let button_y = gpio.get(24)?.into_input();
+
+        let button_a_led = gpio.get(23)?.into_output();
+        let button_b_led = gpio.get(22)?.into_output();
+        let button_x_led = gpio.get(17)?.into_output();
+        let button_y_led = gpio.get(27)?.into_output();
 
         let motor_en = gpio.get(26)?.into_output();
         let motor_left_p = gpio.get(8)?.into_output();
@@ -63,6 +72,10 @@ impl SwiftBot {
             button_b,
             button_x,
             button_y,
+            button_a_led,
+            button_b_led,
+            button_x_led,
+            button_y_led,
             motor_en,
             motor_left_p,
             motor_left_n,
@@ -153,16 +166,29 @@ impl SwiftBot {
         self.sn3218.enable();
     }
 
-    pub fn fill_underlight(&mut self, r: u8, g: u8, b: u8) {
+    pub fn set_underlight(&mut self, r: u8, g: u8, b: u8) {
         for light in 0..6 {
             self.buffer[light * 3] = r;
             self.buffer[(light * 3) + 1] = g;
             self.buffer[(light * 3) + 2] = b;
         }
+        self.show_underlight();
     }
 
     pub fn clear_underlight(&mut self) {
-        self.fill_underlight(0, 0, 0);
+        self.buffer = [0; 18];
         self.sn3218.disable();
+    }
+
+    pub fn set_button_light(&mut self, button: Button, value: f64) {
+        let led = match button {
+            Button::A => &mut self.button_a_led,
+            Button::B => &mut self.button_b_led,
+            Button::X => &mut self.button_x_led,
+            Button::Y => &mut self.button_y_led
+        };
+
+        let frequency = 2000.0;
+        led.set_pwm_frequency(frequency, value).expect("Unable to set PWM motor frequency");
     }
 }
