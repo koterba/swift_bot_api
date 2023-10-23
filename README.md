@@ -16,7 +16,7 @@ let mut bot = SwiftBot::new();
 
 ## Buttons
 
-Trilobot has four buttons to its rear, labelled A, B, X, and Y.
+SwiftBot has four buttons to its rear, labelled A, B, X, and Y.
 These can be read using the `is_pressed()` function, which accepts the ``Button`` enum that consists of the following varients:
 
 * `Button::A`
