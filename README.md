@@ -33,6 +33,23 @@ if is_pressed(Button::A) {
 ```
 
 
+## Button LEDs
+
+Next to each button on the SwiftBot is a white LED. These can be controlled using the `set_button_light()` function, which also accepts the ``Button`` enum like the ``is_pressed()`` method above, followed by a number between `0.0` and `1.0`.
+
+For example, to set the button B light to half brightness you would write:
+
+```rust
+bot.set_button_light(Button::B, 0.5);
+```
+
+To turn the light off you would set the value to ``0.0``:
+
+```rust
+bot.set_button_light(Button::B, 0.0);
+```
+
+
 ## Motors
 
 The SwiftBot features two motors with independent control, enabling [differential steering](https://en.wikipedia.org/wiki/Differential_steering), whereby the speed of one motor can be controlled separately of the other.
