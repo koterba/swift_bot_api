@@ -100,3 +100,15 @@ SwiftBot features a front mounted ultrasonic distance sensor. This sensor can be
 let distance = bot.distance();
 println!("Distance: {}cm", distance);
 ```
+
+## Camera
+
+SwiftBot features a front mounted camera. You can save pictures using the method `bot.save_photo()` followed by the filename, height, width and the exposure time (in ms)
+```rust
+bot.save_photo("image.jpg", 100, 100, 500);
+```
+
+If you would prefer to not save the image, you can get a buffer of the image instead using ``bot.photo_buffer()``
+```rust
+let buffer = bot.photo_buffer(100, 100, 500);
+```
