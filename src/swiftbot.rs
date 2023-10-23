@@ -3,7 +3,13 @@ use std::time::Instant;
 use std::error::Error;
 use std::thread;
 
+// interaction with pi hardware
 use rppal::gpio::{Gpio, InputPin, OutputPin, Level};
+
+// for camera
+use rascam::{SimpleCamera, CameraSettings, info};
+use std::fs::File;
+use std::io::Write;
 
 use crate::sn3218::SN3218;
 
@@ -61,12 +67,16 @@ impl SwiftBot {
         let ultra_trig = gpio.get(13)?.into_output();
         let ultra_echo = gpio.get(25)?.into_input();
 
+        // underlights
         let buffer: [u8; 18] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
         let mut sn3218 = SN3218::new()?;
         sn3218.reset();
         sn3218.output(&buffer);
         sn3218.enable_leds(0b111111111111111111);
         sn3218.disable();
+
+        let mut camera = SimpleCamera::new(info().unwrap().cameras[0].clone()).unwrap();
+        camera.activate().unwrap();
 
         Ok(Self {
             button_a,
@@ -191,5 +201,24 @@ impl SwiftBot {
 
         let frequency = 2000.0;
         led.set_pwm_frequency(frequency, value).expect("Unable to set PWM light frequency");
+    }
+
+    pub fn save_photo(&mut self, filename: &str, width: u32, height: u32, exposure_time: u64) {
+        let b = self.photo_buffer(width, height, exposure_time);
+        File::create(filename).unwrap().write_all(&b).unwrap();
+    }
+
+    pub fn photo_buffer(&mut self, width: u32, height: u32, exposure_time: u64) -> Vec<u8> {
+        let mut camera = SimpleCamera::new(info().unwrap().cameras[0].clone()).unwrap();
+        let _ = camera.configure(CameraSettings {
+            height, width,
+            ..CameraSettings::default()
+        });
+        match camera.activate() {
+            Err(_) => {return Vec::new()},
+            Ok(()) => {}
+        };
+        thread::sleep(Duration::from_millis(exposure_time));
+        camera.take_one().unwrap()
     }
 }
