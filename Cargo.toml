@@ -1,6 +1,6 @@
 [package]
 name = "swift_bot_api"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 authors = ["Alan Koterba alankoterba12312@gmail.com"]
 description = "SwiftBot Rust Library"
