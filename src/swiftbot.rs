@@ -41,7 +41,10 @@ pub struct SwiftBot {
     ultra_echo: InputPin,
 
     sn3218: SN3218,
-    buffer: [u8; 18]
+    buffer: [u8; 18],
+
+    camera: SimpleCamera,
+    camera_configured: bool
 }
 
 #[allow(dead_code)]
@@ -76,7 +79,7 @@ impl SwiftBot {
         sn3218.disable();
 
         let mut camera = SimpleCamera::new(info().unwrap().cameras[0].clone()).unwrap();
-        camera.activate().unwrap();
+        let camera_configured = false;
 
         Ok(Self {
             button_a,
@@ -95,7 +98,9 @@ impl SwiftBot {
             ultra_trig,
             ultra_echo,
             sn3218,
-            buffer
+            buffer,
+            camera,
+            camera_configured
         })
     }
 
@@ -128,7 +133,7 @@ impl SwiftBot {
             pwm_p.set_pwm_frequency(frequency, 1.0).expect(error);
             pwm_n.set_pwm_frequency(frequency, 1.0 - speed).expect(error);
         } else if speed < 0.0 {
-            pwm_p.set_pwm_frequency(frequency, 1.0 - speed).expect(error);
+            pwm_p.set_pwm_frequency(frequency, 1.0 + speed).expect(error);
             pwm_n.set_pwm_frequency(frequency, 1.0).expect(error);
         } else {
             pwm_p.set_pwm_frequency(frequency, 1.0).expect(error);
@@ -203,22 +208,31 @@ impl SwiftBot {
         led.set_pwm_frequency(frequency, value).expect("Unable to set PWM light frequency");
     }
 
+    pub fn clear_button_lights(&mut self) {
+        let buttons = [Button::A, Button::B, Button::X, Button::Y];
+        for button in buttons {
+            self.set_button_light(button, 0.0);
+        }
+    }
+
     pub fn save_photo(&mut self, filename: &str, width: u32, height: u32, exposure_time: u64) {
         let b = self.photo_buffer(width, height, exposure_time);
         File::create(filename).unwrap().write_all(&b).unwrap();
     }
 
     pub fn photo_buffer(&mut self, width: u32, height: u32, exposure_time: u64) -> Vec<u8> {
-        let mut camera = SimpleCamera::new(info().unwrap().cameras[0].clone()).unwrap();
-        let _ = camera.configure(CameraSettings {
-            height, width,
-            ..CameraSettings::default()
-        });
-        match camera.activate() {
-            Err(_) => {return Vec::new()},
-            Ok(()) => {}
-        };
+        if !self.camera_configured {
+            self.camera.configure(CameraSettings {
+                height, width,
+                ..CameraSettings::default()
+            });
+            match self.camera.activate() {
+                Err(_) => {return Vec::new()},
+                Ok(()) => {}
+            };
+            self.camera_configured = true;
+        }
         thread::sleep(Duration::from_millis(exposure_time));
-        camera.take_one().unwrap()
+        self.camera.take_one().unwrap()
     }
 }
