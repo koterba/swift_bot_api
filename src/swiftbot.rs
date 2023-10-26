@@ -78,7 +78,7 @@ impl SwiftBot {
         sn3218.enable_leds(0b111111111111111111);
         sn3218.disable();
 
-        let mut camera = SimpleCamera::new(info().unwrap().cameras[0].clone()).unwrap();
+        let camera = SimpleCamera::new(info().unwrap().cameras[0].clone()).unwrap();
         let camera_configured = false;
 
         Ok(Self {
