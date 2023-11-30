@@ -9,7 +9,7 @@ To start coding your SwiftBot, type ``cargo add swift_bot_api`` add the followin
 ```rust
 use swift_bot_api::*;
 ```
-You will also have to create an instance of the SwiftBot struct, like this:
+You will also have to create an instance of the ``SwiftBot`` struct, like this:
 ```rust
 let mut bot = SwiftBot::new().expect("Unable to initialise SwiftBot");
 ```
