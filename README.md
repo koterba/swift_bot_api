@@ -27,7 +27,7 @@ These can be read using the `is_pressed()` function, which accepts the ``Button`
 For example, to read the A button you would write:
 
 ```rust
-if is_pressed(Button::A) {
+if bot.is_pressed(Button::A) {
     // perform action
 }
 ```
